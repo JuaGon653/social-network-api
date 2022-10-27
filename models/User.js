@@ -16,11 +16,13 @@ const userSchema = new Schema(
             lowercase: true,
             trim: true,
             unique: true,
-            // validates email 
-            validate: [function(email) {
-                var regex = /^([a-z0-9_.-]+)@([\da-z.-]+).([a-z.]{2,6})$/i;
-                return regex.test(email);
-            }, 'Please fill a valid email address']
+            validate: {
+                validator: function(v) {
+                    return /^([a-z0-9\_\.\-]+)\@([\da-z\.\-]+)\.([a-z\.]{2,6})$/i
+                    .test(v);
+                },
+                message: "Please enter a valid email"
+            },
         },
         thoughts: [{
             type: Schema.Types.ObjectId,
