@@ -11,13 +11,15 @@ connection.once('open', async () => {
 
     users.push({
         username: "JuaGon653",
-        email: "Juaninb2003@icloud.com"
+        email: "Juaninb2003icloud.com"
     });
     users.push({
         username: "DQPWC",
         email: "test@gmail.com"
     });
 
-    await User.collection.insertMany(users);
+    for (let user of users) {
+        await User.collection.insertOne(user);
+    }
     process.exit(0);
 })
