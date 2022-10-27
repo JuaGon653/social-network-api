@@ -11,7 +11,7 @@ connection.once('open', async () => {
 
     users.push({
         username: "JuaGon653",
-        email: "Juaninb2003icloud.com"
+        email: "Juaninb2003@icloud.com"
     });
     users.push({
         username: "DQPWC",
@@ -19,7 +19,7 @@ connection.once('open', async () => {
     });
 
     for (let user of users) {
-        await User.collection.insertOne(user);
+        await User.create(user);
     }
     process.exit(0);
 })
