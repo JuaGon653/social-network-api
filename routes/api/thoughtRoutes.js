@@ -1,7 +1,9 @@
 const router = require('express').Router();
 const { Thought, User } = require('../../models/');
 
+// root path '/api/thoughts/'
 router.route('/')
+    // returns all created thoughts
     .get(async (req, res) => {
         try {
             const thoughts = await Thought.find();
@@ -10,6 +12,7 @@ router.route('/')
             res.status(500).json(err);
         }
     })
+    // creates a thought
     .post(async (req, res) => {
         try {
             const newThought = await Thought.create(req.body);
@@ -24,7 +27,9 @@ router.route('/')
         }
     });
 
+// '/api/thoughts/:thoughtId'
 router.route('/:thoughtId')
+    // returns thought that holds the id in the request params
     .get(async (req, res) => {
         try {
             const thought = await Thought.findOne({ _id: req.params.thoughtId });
@@ -33,9 +38,10 @@ router.route('/:thoughtId')
             res.status(500).json(err);
         }
     })
+    // updates a thought
     .put(async (req, res) => {
         try {
-            // replaces field values
+            // replaces updated field values
             const almostUpdateThought = await Thought.findOneAndUpdate(
                 { _id: req.params.thoughtId },
                 { $set: req.body },
@@ -69,6 +75,7 @@ router.route('/:thoughtId')
             res.status(500).json(err);
         }
     })
+    // deletes thought that holds the id in the request params
     .delete(async (req, res) => {
         try {
             const deletedThought = await Thought.findOneAndDelete({ _id: req.params.thoughtId });
