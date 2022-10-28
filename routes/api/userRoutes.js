@@ -21,7 +21,7 @@ router.route('/:userId')
     })
     .put(async (req, res) => {
         try {
-            if (await (req?.body?.email) && !/^([a-z0-9\_\.\-]+)\@([\da-z\.\-]+)\.([a-z\.]{2,6})$/i.test(req.body.email)) {
+            if ((req?.body?.email) && !/^([a-z0-9\_\.\-]+)\@([\da-z\.\-]+)\.([a-z\.]{2,6})$/i.test(req.body.email)) {
                 throw {message: "Please enter a valid email!"};
             };
             const updatedUser = await User
