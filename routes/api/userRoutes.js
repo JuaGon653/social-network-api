@@ -42,7 +42,7 @@ router.route('/:userId')
             if (!deletedUser) {
                 throw {message: 'No user found with the given id.'};
             };
-            
+
             res.status(200).json({message: 'deleted user', user: deletedUser});
         } catch (err) {
             res.status(500).json(err);
@@ -57,5 +57,20 @@ router.post('/', async (req, res) => {
         res.status(500).json(err);
     }
 });
+
+
+// Routes for the friends list
+router.post('/:userId/friends/:friendId', async (req, res) => {
+    try {
+        const userWithFriend = await User.findOneAndUpdate(
+            { _id: req.params.userId },
+            {$addToSet: { friends: req.params.friendId }},
+            { new: true }
+        );
+        res.status(200).json(userWithFriend);
+    } catch (err) {
+        res.status(500).json(err);
+    }
+})
 
 module.exports = router;
