@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const { Thought } = require('../../models/');
+const { Thought, User } = require('../../models/');
 
 router.route('/')
     .get(async (req, res) => {
@@ -13,6 +13,11 @@ router.route('/')
     .post(async (req, res) => {
         try {
             const newThought = await Thought.create(req.body);
+            await User.findOneAndUpdate(
+                { _id: newThought.userId },
+                { $set: { thoughts: newThought._id }},
+                { new: true }
+            );
             res.status(200).json(newThought);
         } catch (err) {
             res.status(500).json(err);
