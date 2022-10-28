@@ -39,6 +39,19 @@ router.route('/:thoughtId')
         } catch (err) {
             res.status(500).json(err);
         }
+    })
+    .delete(async (req, res) => {
+        try {
+            const deletedThought = await Thought.findOneAndDelete({ _id: req.params.thoughtId });
+
+            if (!deletedThought) {
+                throw {message: 'No thought found with the given id.'};
+            };
+
+            res.status(200).json({message: 'deleted thought', thought: deletedThought });
+        } catch (err) {
+            res.status(500).json(err);
+        }
     });
 
 module.exports = router;
