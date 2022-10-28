@@ -19,6 +19,14 @@ router.route('/')
         }
     });
 
-
+router.route('/:thoughtId')
+    .get(async (req, res) => {
+        try {
+            const thought = await Thought.findOne({ _id: req.params.thoughtId });
+            res.status(200).json(thought);
+        } catch (err) {
+            res.status(500).json(err);
+        }
+    });
 
 module.exports = router;
