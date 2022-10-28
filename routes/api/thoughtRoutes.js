@@ -15,7 +15,7 @@ router.route('/')
             const newThought = await Thought.create(req.body);
             await User.findOneAndUpdate(
                 { _id: newThought.userId },
-                { $set: { thoughts: newThought._id }},
+                { $addToSet: { thoughts: newThought._id }},
                 { new: true }
             );
             res.status(200).json(newThought);
@@ -35,12 +35,36 @@ router.route('/:thoughtId')
     })
     .put(async (req, res) => {
         try {
-            const updatedThought = await Thought.findOneAndUpdate(
+            // replaces field values
+            const almostUpdateThought = await Thought.findOneAndUpdate(
                 { _id: req.params.thoughtId },
                 { $set: req.body },
-                { new: true }
+                { new: false }
             );
-            res.status(200).json(updatedThought);
+
+            // if request body has a userId property
+            if (req?.body?.userId) {
+                // removes thought id from previous user
+                await User.findOneAndUpdate(
+                    { _id: almostUpdateThought.userId.toString() },
+                    { $pull: { thoughts: req.params.thoughtId }},
+                    { new: true }
+                );
+                // adds thought id to current user
+                const newUser = await User.findOneAndUpdate(
+                    { _id: req.body.userId },
+                    { $addToSet: { thoughts: almostUpdateThought._id }},
+                    { new: true }
+                );
+                // updates thought username to new user's username
+                await Thought.findOneAndUpdate(
+                    { _id: req.params.thoughtId },
+                    { username: newUser.username }
+                );
+            }
+
+            // returns updated thought
+            res.status(200).json({message: 'Update successful!', updatedThought: await Thought.findOne({ _id: req.params.thoughtId })});
         } catch (err) {
             res.status(500).json(err);
         }
