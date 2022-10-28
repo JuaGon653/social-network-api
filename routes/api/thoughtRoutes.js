@@ -27,6 +27,18 @@ router.route('/:thoughtId')
         } catch (err) {
             res.status(500).json(err);
         }
+    })
+    .put(async (req, res) => {
+        try {
+            const updatedThought = await Thought.findOneAndUpdate(
+                { _id: req.params.thoughtId },
+                { $set: req.body },
+                { new: true }
+            );
+            res.status(200).json(updatedThought);
+        } catch (err) {
+            res.status(500).json(err);
+        }
     });
 
 module.exports = router;
