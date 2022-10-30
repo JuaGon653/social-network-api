@@ -20,7 +20,7 @@ router.route('/')
                 { _id: newThought.userId },
                 { $addToSet: { thoughts: newThought._id }},
                 { new: true }
-            );
+            ).lean({ virtuals: true, getters: true });
             res.status(200).json(newThought);
         } catch (err) {
             res.status(500).json(err);
@@ -32,7 +32,7 @@ router.route('/:thoughtId')
     // returns thought that holds the id in the request params
     .get(async (req, res) => {
         try {
-            const thought = await Thought.findOne({ _id: req.params.thoughtId }).lean();
+            const thought = await Thought.findOne({ _id: req.params.thoughtId }).lean({ virtuals: true, getters: true });
             res.status(200).json(thought);
         } catch (err) {
             res.status(500).json(err);
@@ -70,7 +70,7 @@ router.route('/:thoughtId')
             }
 
             // returns updated thought
-            res.status(200).json({message: 'Update successful!', updatedThought: await Thought.findOne({ _id: req.params.thoughtId })});
+            res.status(200).json({message: 'Update successful!', updatedThought: await Thought.findOne({ _id: req.params.thoughtId }).lean({ virtuals: true, getters: true })});
         } catch (err) {
             res.status(500).json(err);
         }
