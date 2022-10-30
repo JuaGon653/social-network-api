@@ -3,7 +3,7 @@ const User = require('../../models/User');
 
 router.get('/', async (req, res) => {
     try {
-        const users = await User.find().lean().populate('friends', '_id');
+        const users = await User.find().lean();;
         res.json(users);
     } catch(err) {
         res.status(500).json(err);
@@ -84,6 +84,6 @@ router.route('/:userId/friends/:friendId')
         } catch (err) {
             res.status(500).json(err);
         }
-    })   
+    });   
 
 module.exports = router;
