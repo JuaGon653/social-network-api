@@ -6,7 +6,7 @@ router.route('/')
     // returns all created thoughts
     .get(async (req, res) => {
         try {
-            const thoughts = await Thought.find();
+            const thoughts = await Thought.find().lean({ virtuals: true, getters: true });
             res.status(200).json(thoughts);
         } catch (err) {
             res.status(500).json(err);
@@ -32,7 +32,7 @@ router.route('/:thoughtId')
     // returns thought that holds the id in the request params
     .get(async (req, res) => {
         try {
-            const thought = await Thought.findOne({ _id: req.params.thoughtId });
+            const thought = await Thought.findOne({ _id: req.params.thoughtId }).lean();
             res.status(200).json(thought);
         } catch (err) {
             res.status(500).json(err);
@@ -85,6 +85,21 @@ router.route('/:thoughtId')
             };
 
             res.status(200).json({message: 'deleted thought', thought: deletedThought });
+        } catch (err) {
+            res.status(500).json(err);
+        }
+    });
+
+router.route('/:thoughtId/reactions')
+    .post(async (req, res) => {
+        try {
+            const thoughtWithReaction = await Thought.findOneAndUpdate(
+                { _id: req.params.thoughtId },
+                { $push: { reactions: req.body }},
+                { runValidators: true, new: true }
+            ).lean({ virtuals: true, getters: true });
+
+            res.status(200).json(thoughtWithReaction);
         } catch (err) {
             res.status(500).json(err);
         }
