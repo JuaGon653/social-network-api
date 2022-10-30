@@ -90,19 +90,32 @@ router.route('/:thoughtId')
         }
     });
 
-router.route('/:thoughtId/reactions')
-    .post(async (req, res) => {
-        try {
-            const thoughtWithReaction = await Thought.findOneAndUpdate(
-                { _id: req.params.thoughtId },
-                { $push: { reactions: req.body }},
-                { runValidators: true, new: true }
-            ).lean({ virtuals: true, getters: true });
+router.post('/:thoughtId/reactions', async (req, res) => {
+    try {
+        const thoughtWithReaction = await Thought.findOneAndUpdate(
+            { _id: req.params.thoughtId },
+            { $push: { reactions: req.body }},
+            { runValidators: true, new: true }
+        ).lean({ virtuals: true, getters: true });
 
-            res.status(200).json(thoughtWithReaction);
-        } catch (err) {
-            res.status(500).json(err);
-        }
-    });
+        res.status(200).json(thoughtWithReaction);
+    } catch (err) {
+        res.status(500).json(err);
+    }
+});
+
+router.delete('/:thoughtId/reactions/:reactionId', async (req, res) => {
+    try {
+        const thoughtWithoutReaction = await Thought.findOneAndUpdate(
+            { _id: req.params.thoughtId },
+            { $pull: { reactions: { reactionId: req.params.reactionId }}},
+            { new: true }
+        ).lean({ virtuals: true, getters: true });
+
+        res.status(200).json({ message: 'Successfully deleted reaction.', thoughtWithoutReaction });
+    } catch (err) {
+        res.status(500).json(err);
+    }
+})
 
 module.exports = router;
