@@ -3,7 +3,7 @@ const User = require('../../models/User');
 
 router.get('/', async (req, res) => {
     try {
-        const users = await User.find().lean();;
+        const users = await User.find().lean({ virtuals: true });
         res.json(users);
     } catch(err) {
         res.status(500).json(err);
@@ -13,7 +13,7 @@ router.get('/', async (req, res) => {
 router.route('/:userId')
     .get(async (req, res) => {
         try {
-            const user = await User.findOne({ _id: req.params.userId }).populate('friends');
+            const user = await User.findOne({ _id: req.params.userId }).lean({ virtuals: true }).populate('friends');
             res.status(200).json(user);
         } catch (err) {
             res.status(500).json(err);
@@ -29,7 +29,7 @@ router.route('/:userId')
                     { _id: req.params.userId },
                     { $set: req.body },
                     { new: true }
-                );
+                ).lean({ virtuals: true });
             res.status(200).json(updatedUser);
         } catch (err) {
             res.status(500).json(err);
@@ -51,7 +51,7 @@ router.route('/:userId')
 
 router.post('/', async (req, res) => {
     try {
-        const user = await User.create(req.body);
+        const user = await User.create(req.body).lean({ virtuals: true });
         res.status(200).json(user);
     } catch (err) {
         res.status(500).json(err);
@@ -67,7 +67,7 @@ router.route('/:userId/friends/:friendId')
                 { _id: req.params.userId },
                 {$addToSet: { friends: req.params.friendId }},
                 { new: true }
-            );
+            ).lean({ virtuals: true });
             res.status(200).json(userWithFriend);
         } catch (err) {
             res.status(500).json(err);
@@ -79,7 +79,7 @@ router.route('/:userId/friends/:friendId')
                 { _id: req.params.userId },
                 { $pull: { friends: req.params.friendId }},
                 { new: true }
-            );
+            ).lean({ virtuals: true });
             res.status(200).json(deletedUserFriend);
         } catch (err) {
             res.status(500).json(err);
