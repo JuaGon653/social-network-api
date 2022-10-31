@@ -17,7 +17,7 @@ router.route('/')
     .post(async (req, res) => {
         try {
             // returns the created user
-            const user = await User.create(req.body).lean({ virtuals: true });
+            const user = await User.create(req.body);
             res.status(200).json({ message: 'Successfully created user!', user });
         } catch (err) {
             res.status(500).json(err);
@@ -29,7 +29,7 @@ router.route('/:userId')
     .get(async (req, res) => {
         try {
             // returns the user with the given id and populated 'friends' array
-            const user = await User.findOne({ _id: req.params.userId }).lean({ virtuals: true }).populate('friends');
+            const user = await User.findOne({ _id: req.params.userId }).populate('thoughts').lean({ virtuals: true }).populate('friends');
             res.status(200).json(user);
         } catch (err) {
             res.status(500).json(err);
