@@ -1,20 +1,20 @@
 const router = require('express').Router();
 const User = require('../../models/User');
 
-// ".lean({ virtuals: true })" returns documents as plain old javascript objects with virtuals enabled
+// ".lean({ virtuals: true })" - returns documents as plain old javascript objects with virtuals enabled instead of an instance of the mongoose's query class
 
 // '/api/users/'
 router.route('/')
-    .get( async (req, res) => {
+    .get(async (req, res) => {
         try {
             // returns all users
             const users = await User.find().lean({ virtuals: true });
-            res.json(users);
+            res.status(200).json(users);
         } catch(err) {
             res.status(500).json(err);
         }
     })
-    .post( async (req, res) => {
+    .post(async (req, res) => {
         try {
             // returns the created user
             const user = await User.create(req.body).lean({ virtuals: true });
