@@ -1,20 +1,20 @@
 const router = require('express').Router();
 const { Thought, User } = require('../../models/');
 
-// root path '/api/thoughts/'
+// '/api/thoughts/'
 router.route('/')
-    // returns all created thoughts
     .get(async (req, res) => {
         try {
+            // returns all created thoughts
             const thoughts = await Thought.find().lean({ virtuals: true, getters: true });
             res.status(200).json(thoughts);
         } catch (err) {
             res.status(500).json(err);
         }
     })
-    // creates a thought
     .post(async (req, res) => {
         try {
+            // creates and returns new thought and updates the user that created it 'thought' array
             const newThought = await Thought.create(req.body);
             await User.findOneAndUpdate(
                 { _id: newThought.userId },
@@ -29,9 +29,9 @@ router.route('/')
 
 // '/api/thoughts/:thoughtId'
 router.route('/:thoughtId')
-    // returns thought that holds the id in the request params
     .get(async (req, res) => {
         try {
+            // returns thought that holds the id in the request params
             const thought = await Thought.findOne({ _id: req.params.thoughtId }).lean({ virtuals: true, getters: true });
             res.status(200).json(thought);
         } catch (err) {
@@ -92,6 +92,7 @@ router.route('/:thoughtId')
 
 router.post('/:thoughtId/reactions', async (req, res) => {
     try {
+        // adds the reaction to the thought with the given id and returns the updated thought
         const thoughtWithReaction = await Thought.findOneAndUpdate(
             { _id: req.params.thoughtId },
             { $push: { reactions: req.body }},
@@ -106,6 +107,7 @@ router.post('/:thoughtId/reactions', async (req, res) => {
 
 router.delete('/:thoughtId/reactions/:reactionId', async (req, res) => {
     try {
+        // removes the reaction and returns the updated thought
         const thoughtWithoutReaction = await Thought.findOneAndUpdate(
             { _id: req.params.thoughtId },
             { $pull: { reactions: { reactionId: req.params.reactionId }}},
