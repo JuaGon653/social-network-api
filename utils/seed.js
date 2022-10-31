@@ -27,7 +27,21 @@ connection.once('open', async () => {
 
     for (let user of users) {
         createdUsers.push(await User.create(user));
+        
     };
+
+    await User.findOneAndUpdate(
+        { _id: createdUsers[0]._id },
+        {$addToSet: { friends: createdUsers[1]._id }}
+    );
+    await User.findOneAndUpdate(
+        { _id: createdUsers[0]._id },
+        {$addToSet: { friends: createdUsers[2]._id }}
+    );
+    await User.findOneAndUpdate(
+        { _id: createdUsers[2]._id },
+        { $addToSet: { friends: createdUsers[0]._id }}
+    );
 
     const thoughts = [
         {
@@ -47,14 +61,22 @@ connection.once('open', async () => {
         }
     ];
 
-    for (let thought of thoughts)    {
-        const thoughttt = await Thought.create(thought);
+    for (let i = 0; i < thoughts.length; i++)    {
+        const thoughttt = await Thought.create(thoughts[i]);
         await User.findOneAndUpdate(
-            { _id: thought.userId },
+            { _id: thoughts[i].userId },
             { $addToSet: { thoughts: thoughttt._id }},
         );
+        if (i === 0) {
+            await Thought.findOneAndUpdate(
+                { _id: thoughttt._id },
+                { $push: { reactions: { reactionBody: 'What a thought!', username: 'JuaGon653' } }},
+                { runValidators: true, new: true }
+            );
+        }
     };
 
     
+
     process.exit(0);
 })
