@@ -21,7 +21,7 @@ router.route('/')
                 { $addToSet: { thoughts: newThought._id }},
                 { new: true }
             ).lean({ virtuals: true, getters: true });
-            res.status(200).json(newThought);
+                res.status(200).json({ message: 'Successfully created thought!', newThought });
         } catch (err) {
             res.status(500).json(err);
         }
@@ -70,7 +70,7 @@ router.route('/:thoughtId')
             }
 
             // returns updated thought
-            res.status(200).json({message: 'Update successful!', updatedThought: await Thought.findOne({ _id: req.params.thoughtId }).lean({ virtuals: true, getters: true })});
+            res.status(200).json({message: 'Successfully updated thought!', updatedThought: await Thought.findOne({ _id: req.params.thoughtId }).lean({ virtuals: true, getters: true })});
         } catch (err) {
             res.status(500).json(err);
         }
@@ -84,7 +84,7 @@ router.route('/:thoughtId')
                 throw {message: 'No thought found with the given id.'};
             };
 
-            res.status(200).json({message: 'deleted thought', thought: deletedThought });
+            res.status(200).json({message: 'Successfully deleted thought!', deletedThought });
         } catch (err) {
             res.status(500).json(err);
         }
@@ -99,7 +99,7 @@ router.post('/:thoughtId/reactions', async (req, res) => {
             { runValidators: true, new: true }
         ).lean({ virtuals: true, getters: true });
 
-        res.status(200).json(thoughtWithReaction);
+        res.status(200).json({ message: 'Successfully added reaction!', thoughtWithReaction });
     } catch (err) {
         res.status(500).json(err);
     }
@@ -114,7 +114,7 @@ router.delete('/:thoughtId/reactions/:reactionId', async (req, res) => {
             { new: true }
         ).lean({ virtuals: true, getters: true });
 
-        res.status(200).json({ message: 'Successfully deleted reaction.', thoughtWithoutReaction });
+        res.status(200).json({ message: 'Successfully deleted reaction!', thoughtWithoutReaction });
     } catch (err) {
         res.status(500).json(err);
     }
