@@ -1,5 +1,6 @@
 // the mongoose's Schema contructor and model method 
 const { Schema, model } = require('mongoose');
+const mongooseLeanVirtuals = require('mongoose-lean-virtuals');
 
 // user schema/skeleton of a user document
 const userSchema = new Schema(
@@ -48,6 +49,8 @@ userSchema
     .get(function() {
         return this.friends.length;
     });
+
+userSchema.plugin(mongooseLeanVirtuals);
 
 // creates mongoose model
 const User = model('user', userSchema);

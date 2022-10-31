@@ -1,19 +1,35 @@
 const router = require('express').Router();
 const User = require('../../models/User');
 
-router.get('/', async (req, res) => {
-    try {
-        const users = await User.find().lean().populate('friends', '_id');
-        res.json(users);
-    } catch(err) {
-        res.status(500).json(err);
-    }
-});
+// ".lean({ virtuals: true })" - returns documents as plain old javascript objects with virtuals enabled instead of an instance of the mongoose's query class
 
+// '/api/users/'
+router.route('/')
+    .get(async (req, res) => {
+        try {
+            // returns all users
+            const users = await User.find().lean({ virtuals: true });
+            res.status(200).json(users);
+        } catch(err) {
+            res.status(500).json(err);
+        }
+    })
+    .post(async (req, res) => {
+        try {
+            // returns the created user
+            const user = await User.create(req.body).lean({ virtuals: true });
+            res.status(200).json({ message: 'Successfully created user!', user });
+        } catch (err) {
+            res.status(500).json(err);
+        }
+    });
+
+// '/api/users/:userId'
 router.route('/:userId')
     .get(async (req, res) => {
         try {
-            const user = await User.findOne({ _id: req.params.userId }).populate('friends');
+            // returns the user with the given id and populated 'friends' array
+            const user = await User.findOne({ _id: req.params.userId }).lean({ virtuals: true }).populate('friends');
             res.status(200).json(user);
         } catch (err) {
             res.status(500).json(err);
@@ -21,69 +37,65 @@ router.route('/:userId')
     })
     .put(async (req, res) => {
         try {
-            if ((req?.body?.email) && !/^([a-z0-9\_\.\-]+)\@([\da-z\.\-]+)\.([a-z\.]{2,6})$/i.test(req.body.email)) {
-                throw {message: "Please enter a valid email!"};
-            };
+            // returns the updated user if validators pass
             const updatedUser = await User
                 .findOneAndUpdate(
                     { _id: req.params.userId },
                     { $set: req.body },
-                    { new: true }
-                );
-            res.status(200).json(updatedUser);
+                    { runValidators: true, new: true }
+                ).lean({ virtuals: true });
+            res.status(200).json({ message: 'Successfully updated user!', updatedUser });
         } catch (err) {
             res.status(500).json(err);
         }
     })
     .delete(async (req, res) => {
         try {
+            // returns the deleted user
             const deletedUser = await User.findOneAndDelete({ _id: req.params.userId });
 
+            // if no user found, returns a message
             if (!deletedUser) {
                 throw {message: 'No user found with the given id.'};
             };
 
-            res.status(200).json({message: 'deleted user', user: deletedUser});
+            res.status(200).json({message: 'Successfully deleted user!', deletedUser});
         } catch (err) {
             res.status(500).json(err);
         }
     });
 
-router.post('/', async (req, res) => {
-    try {
-        const user = await User.create(req.body);
-        res.status(200).json(user);
-    } catch (err) {
-        res.status(500).json(err);
-    }
-});
+
 
 
 // Routes for the friends list
+// '/api/users/:userId/friends/:friendId'
 router.route('/:userId/friends/:friendId')
     .post(async (req, res) => {
         try {
+            // adds friend id to 'friends' array and returns the updated user
             const userWithFriend = await User.findOneAndUpdate(
                 { _id: req.params.userId },
                 {$addToSet: { friends: req.params.friendId }},
                 { new: true }
-            );
-            res.status(200).json(userWithFriend);
+            ).lean({ virtuals: true });
+            res.status(200).json({ message: 'Successfully added friend!', userWithFriend });
         } catch (err) {
             res.status(500).json(err);
         }
     })
     .delete(async (req, res) => {
         try {
-            const deletedUserFriend = await User.findOneAndUpdate(
+            // pulls the friend with the given id from the given user id and returns the updated user
+            const userWithOutFriend = await User.findOneAndUpdate(
                 { _id: req.params.userId },
                 { $pull: { friends: req.params.friendId }},
                 { new: true }
-            );
-            res.status(200).json(deletedUserFriend);
+            ).lean({ virtuals: true });
+            res.status(200).json({ message: 'Successfully removed friend!', userWithOutFriend });
         } catch (err) {
             res.status(500).json(err);
         }
-    })   
+    });   
 
 module.exports = router;

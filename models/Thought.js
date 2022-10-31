@@ -1,4 +1,6 @@
 const { Schema, model } = require('mongoose');
+const mongooseLeanVirtuals = require('mongoose-lean-virtuals');
+const mongooseLeanGetters = require('mongoose-lean-getters');
 const Reaction = require('./Reaction');
 
 // Thought document skeleton/schema
@@ -13,9 +15,9 @@ const thoughtSchema = new Schema(
         createdAt: {
             type: Date,
             default: Date.now,
-            get() {
+            get: function(createdAt) {
                 // date formatter copied from https://stackoverflow.com/a/11591900
-                return (((this.createdAt.getMonth() > 8) ? (this.createdAt.getMonth() + 1) : ('0' + (this.createdAt.getMonth() + 1))) + '/' + ((this.createdAt.getDate() > 9) ? this.createdAt.getDate() : ('0' + this.createdAt.getDate())) + '/' + this.createdAt.getFullYear())
+                return (((createdAt.getMonth() > 8) ? (createdAt.getMonth() + 1) : ('0' + (createdAt.getMonth() + 1))) + '/' + ((createdAt.getDate() > 9) ? createdAt.getDate() : ('0' + createdAt.getDate())) + '/' + createdAt.getFullYear())
             }
         },
         username: {
@@ -43,6 +45,9 @@ thoughtSchema
     .get(function() {
         return this.reactions.length;
     });
+
+thoughtSchema.plugin(mongooseLeanVirtuals);
+thoughtSchema.plugin(mongooseLeanGetters);
 
 // mongoose model created
 const Thought = model('thought', thoughtSchema);

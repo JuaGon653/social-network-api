@@ -1,27 +1,29 @@
 const router = require('express').Router();
 const { Thought, User } = require('../../models/');
 
-// root path '/api/thoughts/'
+// ".lean({ virtuals: true, getters: true })" - returns documents as plain old javascript objects with virtuals and getters enabled instead of an instance of the mongoose's query class
+
+// '/api/thoughts/'
 router.route('/')
-    // returns all created thoughts
     .get(async (req, res) => {
         try {
-            const thoughts = await Thought.find();
+            // returns all created thoughts
+            const thoughts = await Thought.find().lean({ virtuals: true, getters: true });
             res.status(200).json(thoughts);
         } catch (err) {
             res.status(500).json(err);
         }
     })
-    // creates a thought
     .post(async (req, res) => {
         try {
+            // creates and returns new thought and updates the user that created it 'thought' array
             const newThought = await Thought.create(req.body);
             await User.findOneAndUpdate(
                 { _id: newThought.userId },
                 { $addToSet: { thoughts: newThought._id }},
                 { new: true }
-            );
-            res.status(200).json(newThought);
+            ).lean({ virtuals: true, getters: true });
+                res.status(200).json({ message: 'Successfully created thought!', newThought });
         } catch (err) {
             res.status(500).json(err);
         }
@@ -29,10 +31,10 @@ router.route('/')
 
 // '/api/thoughts/:thoughtId'
 router.route('/:thoughtId')
-    // returns thought that holds the id in the request params
     .get(async (req, res) => {
         try {
-            const thought = await Thought.findOne({ _id: req.params.thoughtId });
+            // returns thought that holds the id in the request params
+            const thought = await Thought.findOne({ _id: req.params.thoughtId }).lean({ virtuals: true, getters: true });
             res.status(200).json(thought);
         } catch (err) {
             res.status(500).json(err);
@@ -45,7 +47,7 @@ router.route('/:thoughtId')
             const almostUpdateThought = await Thought.findOneAndUpdate(
                 { _id: req.params.thoughtId },
                 { $set: req.body },
-                { new: false }
+                { runValidators: true, new: false }
             );
 
             // if request body has a userId property
@@ -70,7 +72,7 @@ router.route('/:thoughtId')
             }
 
             // returns updated thought
-            res.status(200).json({message: 'Update successful!', updatedThought: await Thought.findOne({ _id: req.params.thoughtId })});
+            res.status(200).json({message: 'Successfully updated thought!', updatedThought: await Thought.findOne({ _id: req.params.thoughtId }).lean({ virtuals: true, getters: true })});
         } catch (err) {
             res.status(500).json(err);
         }
@@ -84,10 +86,40 @@ router.route('/:thoughtId')
                 throw {message: 'No thought found with the given id.'};
             };
 
-            res.status(200).json({message: 'deleted thought', thought: deletedThought });
+            res.status(200).json({message: 'Successfully deleted thought!', deletedThought });
         } catch (err) {
             res.status(500).json(err);
         }
     });
+
+router.post('/:thoughtId/reactions', async (req, res) => {
+    try {
+        // adds the reaction to the thought with the given id and returns the updated thought
+        const thoughtWithReaction = await Thought.findOneAndUpdate(
+            { _id: req.params.thoughtId },
+            { $push: { reactions: req.body }},
+            { runValidators: true, new: true }
+        ).lean({ virtuals: true, getters: true });
+
+        res.status(200).json({ message: 'Successfully added reaction!', thoughtWithReaction });
+    } catch (err) {
+        res.status(500).json(err);
+    }
+});
+
+router.delete('/:thoughtId/reactions/:reactionId', async (req, res) => {
+    try {
+        // removes the reaction and returns the updated thought
+        const thoughtWithoutReaction = await Thought.findOneAndUpdate(
+            { _id: req.params.thoughtId },
+            { $pull: { reactions: { reactionId: req.params.reactionId }}},
+            { new: true }
+        ).lean({ virtuals: true, getters: true });
+
+        res.status(200).json({ message: 'Successfully removed reaction!', thoughtWithoutReaction });
+    } catch (err) {
+        res.status(500).json(err);
+    }
+})
 
 module.exports = router;
