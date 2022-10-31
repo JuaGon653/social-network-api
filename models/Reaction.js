@@ -18,9 +18,9 @@ const reactionSchema = new Schema(
         createdAt: {
             type: Date,
             default: Date.now,
-            get() {
+            get: function (createdAt) {
                 // date formatter copied from https://stackoverflow.com/a/11591900
-                return (((this.createdAt.getMonth() > 8) ? (this.createdAt.getMonth() + 1) : ('0' + (this.createdAt.getMonth() + 1))) + '/' + ((this.createdAt.getDate() > 9) ? this.createdAt.getDate() : ('0' + this.createdAt.getDate())) + '/' + this.createdAt.getFullYear())
+                return (((createdAt.getMonth() > 8) ? (createdAt.getMonth() + 1) : ('0' + (createdAt.getMonth() + 1))) + '/' + ((createdAt.getDate() > 9) ? createdAt.getDate() : ('0' + createdAt.getDate())) + '/' + createdAt.getFullYear())
             }
         }
     },
