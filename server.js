@@ -3,8 +3,6 @@ const express = require('express');
 // returning connection and route modules
 const db = require('./config/connection');
 const routes = require('./routes');
-// returns the mongoose models
-// const { *models* } = require('./models'); 
 
 // environment variable PORT or local port 3001
 const PORT = process.env.PORT || 3001;
