@@ -21,14 +21,11 @@ router.route('/:userId')
     })
     .put(async (req, res) => {
         try {
-            if ((req?.body?.email) && !/^([a-z0-9\_\.\-]+)\@([\da-z\.\-]+)\.([a-z\.]{2,6})$/i.test(req.body.email)) {
-                throw {message: "Please enter a valid email!"};
-            };
             const updatedUser = await User
                 .findOneAndUpdate(
                     { _id: req.params.userId },
                     { $set: req.body },
-                    { new: true }
+                    { runValidators: true, new: true }
                 ).lean({ virtuals: true });
             res.status(200).json(updatedUser);
         } catch (err) {
