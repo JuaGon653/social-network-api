@@ -114,7 +114,7 @@ router.delete('/:thoughtId/reactions/:reactionId', async (req, res) => {
             { new: true }
         ).lean({ virtuals: true, getters: true });
 
-        res.status(200).json({ message: 'Successfully deleted reaction!', thoughtWithoutReaction });
+        res.status(200).json({ message: 'Successfully removed reaction!', thoughtWithoutReaction });
     } catch (err) {
         res.status(500).json(err);
     }

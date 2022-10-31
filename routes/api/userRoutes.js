@@ -18,7 +18,7 @@ router.route('/')
         try {
             // returns the created user
             const user = await User.create(req.body).lean({ virtuals: true });
-            res.status(200).json(user);
+            res.status(200).json({ message: 'Successfully created user!', user });
         } catch (err) {
             res.status(500).json(err);
         }
@@ -44,7 +44,7 @@ router.route('/:userId')
                     { $set: req.body },
                     { runValidators: true, new: true }
                 ).lean({ virtuals: true });
-            res.status(200).json(updatedUser);
+            res.status(200).json({ message: 'Successfully updated user!', updatedUser });
         } catch (err) {
             res.status(500).json(err);
         }
@@ -59,7 +59,7 @@ router.route('/:userId')
                 throw {message: 'No user found with the given id.'};
             };
 
-            res.status(200).json({message: 'deleted user', user: deletedUser});
+            res.status(200).json({message: 'Successfully deleted user!', deletedUser});
         } catch (err) {
             res.status(500).json(err);
         }
@@ -79,7 +79,7 @@ router.route('/:userId/friends/:friendId')
                 {$addToSet: { friends: req.params.friendId }},
                 { new: true }
             ).lean({ virtuals: true });
-            res.status(200).json(userWithFriend);
+            res.status(200).json({ message: 'Successfully added friend!', userWithFriend });
         } catch (err) {
             res.status(500).json(err);
         }
@@ -87,12 +87,12 @@ router.route('/:userId/friends/:friendId')
     .delete(async (req, res) => {
         try {
             // pulls the friend with the given id from the given user id and returns the updated user
-            const deletedUserFriend = await User.findOneAndUpdate(
+            const userWithOutFriend = await User.findOneAndUpdate(
                 { _id: req.params.userId },
                 { $pull: { friends: req.params.friendId }},
                 { new: true }
             ).lean({ virtuals: true });
-            res.status(200).json(deletedUserFriend);
+            res.status(200).json({ message: 'Successfully removed friend!', userWithOutFriend });
         } catch (err) {
             res.status(500).json(err);
         }
