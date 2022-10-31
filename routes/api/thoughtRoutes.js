@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const { Thought, User } = require('../../models/');
 
-// ".lean({ virtuals: true })" - returns documents as plain old javascript objects with virtuals enabled instead of an instance of the mongoose's query class
+// ".lean({ virtuals: true, getters: true })" - returns documents as plain old javascript objects with virtuals and getters enabled instead of an instance of the mongoose's query class
 
 // '/api/thoughts/'
 router.route('/')
