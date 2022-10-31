@@ -8,33 +8,44 @@ connection.once('open', async () => {
     await User.deleteMany({});
     await Thought.deleteMany({});
 
-    const users = [];
-    const thoughts = [];
+    const users = [
+        {
+            username: 'NikJRuiz1345',
+            email: 'nikj123@gmail.com'
+        },
+        {
+            username: 'Juicegoosy',
+            email: 'memome@hotmail.com'
+        },
+        {
+            username: 'JuaGon653',
+            email: 'gonzaj7653@g.comalisd.edu'
+        }
+    ];
 
-    users.push({
-        username: "JuaGon653",
-        email: "Juaninb2003@icloud.com"
-    });
-    users.push({
-        username: "DQPWC",
-        email: "test@gmail.com"
-    });
+    let createdUsers = [];
 
     for (let user of users) {
-        await User.create(user);
-    }
+        createdUsers.push(await User.create(user));
+    };
 
-    let id = await User.find();
-    thoughts.push({
-        thoughtText: "This is a thought...",
-        username: "JuaGon653",
-        userId: id[0]._id
-    });
-    thoughts.push({
-        thoughtText: "That's enough",
-        username: "JuaGon653",
-        userId: id[0]._id
-    });
+    const thoughts = [
+        {
+            thoughtText: 'This is a thought...',
+            username: 'JuaGon653',
+            userId: createdUsers[2]._id
+        },
+        {
+            thoughtText: 'You fake sleep in order to fall asleep.',
+            username: 'Juicegoosy',
+            userId: createdUsers[1]._id
+        },
+        {
+            thoughtText: 'Pleasure is the minds greatest disease.',
+            username: 'Juicegoosy',
+            userId: createdUsers[1]._id
+        }
+    ];
 
     for (let thought of thoughts)    {
         const thoughttt = await Thought.create(thought);
@@ -42,6 +53,8 @@ connection.once('open', async () => {
             { _id: thought.userId },
             { $addToSet: { thoughts: thoughttt._id }},
         );
-    }
+    };
+
+    
     process.exit(0);
 })
