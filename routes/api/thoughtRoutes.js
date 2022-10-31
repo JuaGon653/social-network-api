@@ -45,7 +45,7 @@ router.route('/:thoughtId')
             const almostUpdateThought = await Thought.findOneAndUpdate(
                 { _id: req.params.thoughtId },
                 { $set: req.body },
-                { new: false }
+                { runValidators: true, new: false }
             );
 
             // if request body has a userId property
