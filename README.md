@@ -19,3 +19,11 @@ In the making of this application the routes and responses worked fine until I g
 - [x] THEN I am able to successfully create, update, and delete users and thoughts in my database <br>
 - WHEN I test API POST and DELETE routes in Insomnia <br>
 - [x] THEN I am able to successfully create and delete reactions to thoughts and add and remove friends to a user’s friend list <br>
+
+## How to Run on Local Computer
+1. Clone repo onto your local computer
+2. In the terminal, navigate to the root of the folder
+3. Run 'npm install' (installing all dependencies)
+4. Run 'node utils/seed' (seeding the database with data)
+5. Run 'node server' (starting up server on local computer)
+6. Request away!
